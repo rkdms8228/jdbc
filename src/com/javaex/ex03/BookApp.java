@@ -25,7 +25,7 @@ public class BookApp {
 		List<BookVo> bookList = bookDao.bookSelect();
 		
 		System.out.print("검색: ");
-		String keyword = sc.next();
+		String keyword = sc.nextLine();
 		
 		for(int i = 0; i<bookList.size(); i++) {
 			
