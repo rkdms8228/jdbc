@@ -1,4 +1,4 @@
-package com.javaex.ex03;
+package com.javaex.ex05;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +8,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/********** 
+ * Dao(Data Access Object)
+ * DataBase(오라클) 관련된 일을 하는 클래스
+ **********/
+
 public class AuthorDao {
 	
 	//필드
@@ -16,6 +21,7 @@ public class AuthorDao {
 	private String driver = "oracle.jdbc.driver.OracleDriver";
 	private String url = "jdbc:oracle:thin:@localhost:1521:xe";
 	
+	// 0. import java.sql.*;
 	private Connection conn = null;
 	private PreparedStatement pstmt = null;
 	private ResultSet rs = null;
@@ -31,7 +37,7 @@ public class AuthorDao {
 	public void getConnection() {
 		
 		try {
-
+			
 			// 1. JDBC 드라이버 (Oracle) 로딩
 			Class.forName(driver);
 			
@@ -42,7 +48,8 @@ public class AuthorDao {
 			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
-		}
+		} 
+		
 		
 	}
 	
@@ -68,10 +75,11 @@ public class AuthorDao {
 	}
 	
 	//>작가 등록 메소드
-	public int authorInsert(String authorName, String authorDesc) {
+	public int authorInsert(AuthorVo authorVo) {
 		
 		int count = -1;
 		
+		//this.getConnection();
 		getConnection();
 
 		try {
@@ -85,19 +93,20 @@ public class AuthorDao {
 			
 			//바인딩
 			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, authorName);
-			pstmt.setString(2, authorDesc);
+			pstmt.setString(1, authorVo.getAuthorName());
+			pstmt.setString(2, authorVo.getAuthorDesc());
 			
 			//실행
 			count = pstmt.executeUpdate();
 			
 			// 4.결과처리
-			System.out.println("count " + count + "개 생성되었습니다.");
+			System.out.println("count " + count + "건이 생성되었습니다.");
 
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
 		}
 		
+		//this.close();
 		close();
 		
 		return count;
@@ -133,7 +142,7 @@ public class AuthorDao {
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
 		}
-			
+		
 		close();
 		
 		return count;
@@ -141,7 +150,7 @@ public class AuthorDao {
 	}
 	
 	//작가 수정 메소드
-	public int authorUpdate(String authorName, String authorDesc, int authorId) {
+	public int authorUpdate(AuthorVo authorVo) {
 		
 		int count = -1;
 		
@@ -160,9 +169,9 @@ public class AuthorDao {
 			
 			//바인딩
 			pstmt = conn.prepareStatement(query); //문자열 커리로 만들기
-			pstmt.setString(1, authorName);			  //?(물음표) 중 1번째 --> 순서 중요
-			pstmt.setString(2, authorDesc);		      //?(물음표) 중 2번째 --> 순서 중요
-			pstmt.setInt(3, authorId);
+			pstmt.setString(1, authorVo.getAuthorName());			  //?(물음표) 중 1번째 --> 순서 중요
+			pstmt.setString(2, authorVo.getAuthorDesc());		      //?(물음표) 중 2번째 --> 순서 중요
+			pstmt.setInt(3, authorVo.getAuthorId());
 			
 			//실행
 			count = pstmt.executeUpdate();	  //쿼리문 실행 --> 성공 갯수 리턴 [insert, update, delete]
@@ -187,7 +196,7 @@ public class AuthorDao {
 		List<AuthorVo> authorList = new ArrayList<AuthorVo>();
 		
 		getConnection();
-		
+
 		try {
 
 			// 3. SQL문 준비 / 바인딩 / 실행
@@ -240,10 +249,20 @@ public class AuthorDao {
 	/*
 	 public List<AuthorVo> authorSelect() {
 		
-		getConnection();
+		// 0. import java.sql.*;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 
 		try {
 
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			conn = DriverManager.getConnection(url, id, pw);
+			
 			// 3. SQL문 준비 / 바인딩 / 실행
 			
 			//SQL문 준비
@@ -285,11 +304,29 @@ public class AuthorDao {
 			//리스트 출력해 보기
 			//System.out.println(authorList.toString());
 			
+		} catch (ClassNotFoundException e) {
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
+		} finally {
+
+			// 5. 자원정리
+			try {
+				
+				if (rs != null) {
+					rs.close();
+				}
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+				
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
 		}
-		
-		close();
 		
 	}
 	 */

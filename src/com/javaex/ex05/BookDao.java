@@ -1,4 +1,4 @@
-package com.javaex.ex03;
+package com.javaex.ex05;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -68,7 +68,7 @@ public class BookDao {
 	}
 	
 	//책 등록 메소드
-	public int bookInsert(String title, String pubs, String pubDate, int authorId) {
+	public int bookInsert(BookVo bookVo) {
 		
 		int count = -1;
 		
@@ -85,10 +85,10 @@ public class BookDao {
 			
 			//바인딩
 			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, title);
-			pstmt.setString(2, pubs);
-			pstmt.setString(3, pubDate);
-			pstmt.setInt(4, authorId);
+			pstmt.setString(1, bookVo.getTitle());
+			pstmt.setString(2, bookVo.getPubs());
+			pstmt.setString(3, bookVo.getPubDate());
+			pstmt.setInt(4, bookVo.getAuthorId());
 			
 			//실행
 			count = pstmt.executeUpdate();
@@ -98,8 +98,8 @@ public class BookDao {
 
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
-		} 
-
+		}
+		
 		close();
 		
 		return count;
@@ -144,14 +144,14 @@ public class BookDao {
 	}
 	
 	//책 수정 메소드
-	public int bookUpdate(String bookDate, int bookId) {
+	public int bookUpdate(BookVo bookVo) {
 		
 		int count = -1;
 		
 		getConnection();
 
 		try {
-
+			
 			// 3. SQL문 준비 / 바인딩 / 실행
 			
 			//SQL문 준비
@@ -162,8 +162,8 @@ public class BookDao {
 			
 			//바인딩
 			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, bookDate);
-			pstmt.setInt(2, bookId);
+			pstmt.setString(1, bookVo.getPubDate());
+			pstmt.setInt(2, bookVo.getBookId());
 			
 			//실행
 			count = pstmt.executeUpdate();
@@ -174,7 +174,7 @@ public class BookDao {
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
 		}
-
+		
 		close();
 		
 		return count;
@@ -188,7 +188,7 @@ public class BookDao {
 		List<BookVo> bookList = new ArrayList<BookVo>();
 		
 		getConnection();
-
+		
 		try {
 
 			// 3. SQL문 준비 / 바인딩 / 실행
